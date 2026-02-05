@@ -125,6 +125,7 @@ while True:
     else:
       price8_placeholder.metric(label="Amazon",value="None",delta="--")
 
+
     df=yf.Ticker(ticker_googl).history(period="1d",interval="1m")
     if not df.empty:
       current_price = df['Close'].iloc[-1]
