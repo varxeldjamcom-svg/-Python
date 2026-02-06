@@ -10,27 +10,20 @@ class ticker:
     self.holder = holder
     self.name = name
 
-my_tickers = []
-my_tickers.append(ticker("^N225", price_placeholder, "日経平均株価"))
-my_tickers.append(ticker("USDJPY=X", price4_placeholder, "USD/JPY"))
-my_tickers.append(ticker("1343.T", price5_placeholder, "東証REIT指数ETF"))
-my_tickers.append(ticker("JOBY", price7_placeholder, "Joby Aviation"))
-my_tickers.append(ticker("ACHR", price8_placeholder, "Archer Aviation"))
-my_tickers.append(ticker("RACE", price9_placeholder, "Ferrari"))
-my_tickers.append(ticker("NVDA", price10_placeholder, "NVIDIA"))
-my_tickers.append(ticker())
-
-
-def update(ticker_symbol):
+def update(ticker_symbol) -> str:
 
   df = yf.Ticker(ticker_symbol).history(period="1d", interval="1m")
-  current_price = df['Close'].iloc[-1]
-  previous_price = df['Close'].iloc[-2]
-  open_price = df['Open'].iloc[0]
-  delta_day = current_price - open_price
-  delta =current_price - previous_price
-
-  return current_price, delta_day, delta
+  if df.empty:
+    current_price = df['Close'].iloc[-1]
+    previous_price = df['Close'].iloc[-2]
+    open_price = df['Open'].iloc[0]
+    delta_day = current_price - open_price
+    delta =current_price - previous_price
+  else:
+    current_price = "None"
+    delta_day = "--"
+    delta = "--"   
+  return str(current_price), str(delta_day), str(delta)
 
 def main():
   st.set_page_config(layout="wide")
@@ -81,36 +74,42 @@ def main():
     price11_placeholder = st.empty()
   with col12:
     price12_placeholder = st.empty()
-
-#df = yf.Ticker(ticker).history(period="1d",interval="1m")
-  update_matrix = [
-    ["^N225", price_placeholder, "日経平均株価"],
-    ["USDJPY=X", price4_placeholder, "USD/JPY"],
-    ["1343.T", price5_placeholder, "東証REIT指数ETF"],
-    ["JOBY", price7_placeholder, "JOBY"],
-    ["ACHR", price8_placeholder, "ACHR"],
-    ["RACE", price9_placeholder, "Ferrari"],
-    ["NVDA", price10_placeholder, "NVIDIA"],
-    ["AMZN", price11_placeholder, "Amazon"],
-    ["GOOL", price12_placeholder, "Google"]
-  ]
+  
+  my_tickers = []
+  my_tickers.append(ticker("^N225", price_placeholder, "日経平均株価"))
+  my_tickers.append(ticker("USDJPY=X", price4_placeholder, "USD/JPY"))
+  my_tickers.append(ticker("1343.T", price5_placeholder, "東証REIT指数ETF"))
+  my_tickers.append(ticker("JOBY", price7_placeholder, "Joby Aviation"))
+  my_tickers.append(ticker("ACHR", price8_placeholder,"Archer Aviation"))
+  my_tickers.append(ticker("RACE", price9_placeholder, "Ferrari"))
+  my_tickers.append(ticker("NVDA", price10_placeholder, "NVIDIA"))
+  my_tickers.append(ticker("AMZN", price11_placeholder, "Amazon"))
+  my_tickers.append(ticker("GOOGL", price12_placeholder, "Google"))
 
   while True:
     now_jst = datetime.now(ZoneInfo("Asia/Tokyo"))
     clock_placeholder.header(now_jst.strftime("%Y/%m/%d %H:%M:%S(%Z)"))
     
     if last_update_time.minute != now_jst.minute:
+      
+      tk = my_tickers[0]
+      sprice, sdelta_day, sdelta = update(tk.symbol)
+      #str1 = f"{str(current_price):,.2f}"
+      #str2 = f"{str(delta_day):+,.2f}"
+      #str3 = f"{str(delta):,.2f}"
 
-      df =  yf.Ticker(ticker_n255).history(period="1d",interval="1m")
-      if not df.empty:
-        current_price = df['Close'].iloc[-1]
-        previous_price = df['Close'].iloc[-2]
-        open_price = df['Open'].iloc[0]
-        delta_day = current_price - open_price
-        delta = current_price - previous_price
-        price_placeholder.metric(label="日経平均株価", value = f"{current_price:,.2f} ({delta_day:+,.2f})", delta = f"{delta:,.2f}")
-      else:
-        price_placeholder.metric(label="日経平均株価", value = "None" ,delta = "--")
+      tk.holder.metric(label=f"{tk.name} ({tk.symbol})", value= f"sprice (sdelta_day)", delta = sdelta)
+
+      #df =  yf.Ticker(ticker_n255).history(period="1d",interval="1m")
+      #if not df.empty:
+        #current_price = df['Close'].iloc[-1]
+        #previous_price = df['Close'].iloc[-2]
+        #open_price = df['Open'].iloc[0]
+        #delta_day = current_price - open_price
+        #delta = current_price - previous_price
+        #price_placeholder.metric(label="日経平均株価", value = f"{current_price:,.2f} ({delta_day:+,.2f})", delta = f"{delta:,.2f}")
+      #else:
+        #price_placeholder.metric(label="日経平均株価", value = "None" ,delta = "--")
 
       df = yf.Ticker(ticker_usd).history(period="1d",interval="1m")
       if not df.empty:
