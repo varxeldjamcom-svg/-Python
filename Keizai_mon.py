@@ -4,19 +4,20 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import time
 
-class ticker:
-  def __init__(self, symbol, holder, name):
-    self.symbol = symbol
-    self.holder = holder
-    self.name = name
+#定数として使用
+ROWS = 3
+COLS = 4
 
-  def update(self):
-    
+class ticker:
+  def __init__(self, symbol, name, holder):
+    self.symbol = symbol
+    self.name = name
+    self.holder = holder
+  def update(self):    
     try:
       df = yf.Ticker(self.symbol).history(period="1d", interval="1m")
     except Exception as e:
       st.warning("更新が中断されました。({e})")
-
     if not df.empty:
       current_price = df['Close'].iloc[-1]
       previous_price = df['Close'].iloc[-2]
@@ -30,60 +31,27 @@ class ticker:
 def main():
   st.set_page_config(layout="wide")
   st.title("株価チャート")
-
   last_update_time = datetime.now() - timedelta(minutes=1)
   clock_placeholder = st.empty()
-
-  col1, col2, col3 = st.columns(3)
-  col4, col5, col6 = st.columns(3)
-  col7, col8, col9 = st.columns(3)
-  col10, col11, col12 = st.columns(3)
-
-  price_holders = [
-    [col1, col2, col3],
-    [col4, col5, col6],
-    [col7, col8, col9],
-    [col10, col11, col12]
-  ]
-  
-  
-
-
-  with col1:
-    price_placeholder = st.empty()
-  with col2:
-    price2_placeholder = st.empty()
-  with col3:
-    price3_placeholder = st.empty()
-  with col4:
-    price4_placeholder = st.empty()
-  with col5:
-    price5_placeholder = st.empty()
-  with col6:
-    price6_placeholder = st.empty()
-  with col7:
-    price7_placeholder = st.empty()
-  with col8:
-    price8_placeholder = st.empty()
-  with col9:  
-    price9_placeholder = st.empty()
-  with col10:
-    price10_placeholder = st.empty()
-  with col11:
-    price11_placeholder = st.empty()
-  with col12:
-    price12_placeholder = st.empty()
+  placeholders = []
+  for i in range(ROWS):
+    cols = st.columns(COLS)
+    row_list = []
+    for col in cols:
+      with col:
+        row_list.append(st.empty())
+    placeholders.append(row_list)
   
   my_tickers = []
-  my_tickers.append(ticker("^N225", price_placeholder, "日経平均株価"))
-  my_tickers.append(ticker("USDJPY=X", price2_placeholder, "USD/JPY"))
-  my_tickers.append(ticker("1343.T", price3_placeholder, "東証REIT指数ETF"))
-  my_tickers.append(ticker("JOBY", price7_placeholder, "Joby Aviation"))
-  my_tickers.append(ticker("ACHR", price8_placeholder,"Archer Aviation"))
-  my_tickers.append(ticker("RACE", price9_placeholder, "Ferrari"))
-  my_tickers.append(ticker("NVDA", price10_placeholder, "NVIDIA"))
-  my_tickers.append(ticker("AMZN", price11_placeholder, "Amazon"))
-  my_tickers.append(ticker("GOOGL", price12_placeholder, "Google"))
+  my_tickers.append(ticker("^N225", "日経平均株価", placeholders[0][0]))
+  my_tickers.append(ticker("USDJPY=X", "USD/JPY", placeholders[0][1]))
+  my_tickers.append(ticker("1343.T", "東証REIT指数ETF", placeholders[0][2]))
+  my_tickers.append(ticker("JOBY", "Joby Aviation", placeholders[1][0]))
+  my_tickers.append(ticker("ACHR", "Archer Aviation", placeholders[1][1]))
+  my_tickers.append(ticker("RACE", "Ferrari", placeholders[1][2]))
+  my_tickers.append(ticker("NVDA", "NVIDIA", placeholders[2][0]))
+  my_tickers.append(ticker("AMZN", "Amazon", placeholders[2][1]))
+  my_tickers.append(ticker("GOOGL", "Google", placeholders[2][2]))
 
   while True:
     now_jst = datetime.now(ZoneInfo("Asia/Tokyo"))
