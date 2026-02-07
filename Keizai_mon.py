@@ -11,8 +11,12 @@ class ticker:
     self.name = name
 
   def update(self):
+    
+    try:
+      df = yf.Ticker(self.symbol).history(period="1d", interval="1m")
+    except Exception as e:
+      st.warning("更新が中断されました。({e})")
 
-    df = yf.Ticker(self.symbol).history(period="1d", interval="1m")
     if not df.empty:
       current_price = df['Close'].iloc[-1]
       previous_price = df['Close'].iloc[-2]
@@ -25,47 +29,44 @@ class ticker:
 
 def main():
   st.set_page_config(layout="wide")
-
   st.title("株価チャート")
-
-  #ticker_n255 = "^N225"
-  #ticker_usd = "USDJPY=X"
-  #ticker_treit = "1343.T"
-  #ticker_joby = "JOBY"
-  #ticker_achr = "ACHR"
-  #ticker_Fer = "RACE" #フェラーリ
-  #ticker_nvda = "NVDA" #NVIDI
-  #ticker_amzn = "AMZN"
-  #ticker_googl = "GOOGL"
 
   last_update_time = datetime.now() - timedelta(minutes=1)
   clock_placeholder = st.empty()
 
-  col1, col2 ,col3= st.columns(3)
+  col1, col2, col3 = st.columns(3)
+  col4, col5, col6 = st.columns(3)
+  col7, col8, col9 = st.columns(3)
+  col10, col11, col12 = st.columns(3)
+
+  price_holders = [
+    [col1, col2, col3],
+    [col4, col5, col6],
+    [col7, col8, col9],
+    [col10, col11, col12]
+  ]
+  
+  
+
+
   with col1:
     price_placeholder = st.empty()
   with col2:
     price2_placeholder = st.empty()
   with col3:
     price3_placeholder = st.empty()
-
-  col4, col5, col6 = st.columns(3)
   with col4:
     price4_placeholder = st.empty()
   with col5:
     price5_placeholder = st.empty()
   with col6:
     price6_placeholder = st.empty()
-
-  col7, col8, col9 = st.columns(3)
   with col7:
     price7_placeholder = st.empty()
   with col8:
     price8_placeholder = st.empty()
   with col9:  
     price9_placeholder = st.empty()
-
-  col10, col11, col12 = st.columns(3)
   with col10:
     price10_placeholder = st.empty()
   with col11:
