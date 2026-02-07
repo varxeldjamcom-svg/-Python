@@ -6,7 +6,7 @@ import time
 
 #定数として使用
 ROWS = 3
-COLS = 4
+COLS = 3
 
 class ticker:
   def __init__(self, symbol, name, holder):
@@ -59,7 +59,7 @@ def main():
     if last_update_time.minute != now_jst.minute: 
       for tk in my_tickers:
         tkprice, tkdelta_day, tkdelta = tk.update()
-        if tkprice > 0:
+        if 0 < tkprice:
           tk.holder.metric(label=f"{tk.name} ({tk.symbol})", value=f"{tkprice:,.2f} ({tkdelta_day:+,.2f})", delta= f"{tkdelta:,.2f}")
         else:
           tk.holder.metric(label=f"{tk.name} ({tk.symbol})", value="None",delta="--")
